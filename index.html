@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WANTED PHOTO BOOTH (6-CUT)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Black+Han+Sans&family=Rye&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* 카우보이 테마에 어울리는 색상 팔레트 */
+            --accent: #ffcc00; /* 황금색 */
+            --wood: #4d2a15;   /* 나무색 */
+            --paper: #f4e4bc;  /* 낡은 종이색 */
+            --danger: #c0392b; /* 현상수배 레드 */
+        }
+        
+        body {
+            font-family: 'Poppins', 'Black Han Sans', sans-serif;
+            /* 배경 이미지 설정 */
+            background: url('main_bg.png') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* 반투명 오버레이로 배경과 콘텐츠 분리 */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: -1;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            text-shadow: 3px 3px 10px rgba(0,0,0,0.8);
+        }
+        
+        .logo { width: 80px; height: 80px; object-fit: contain; }
+        
+        h1 { 
+            font-family: 'Rye', cursive; /* 서부 스타일 폰트 추가 */
+            font-size: 3.5rem; 
+            margin: 0; 
+            color: var(--accent);
+            letter-spacing: 3px;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 30px;
+            max-width: 1400px;
+            width: 100%;
+        }
+        @media (max-width: 1000px) { .main-layout { grid-template-columns: 1fr; } }
+
+        /* 카드 스타일을 낡은 서부 느낌으로 변경 */
+        .camera-section, .preview-section {
+            background: rgba(26, 26, 26, 0.85);
+            padding: 25px;
+            border-radius: 24px;
+            border: 3px solid var(--wood);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .screen-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 5px solid var(--wood);
+        }
+        
+        #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        
+        .overlay-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 120px;
+            font-family: 'Rye', cursive;
+            color: var(--accent);
+            text-shadow: 0 0 30px rgba(255, 204, 0, 0.6);
+            z-index: 10;
+        }
+
+        #finalCanvas {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            background: #222;
+            border: 2px solid var(--paper);
+        }
+
+        /* 버튼 스타일: 거친 서부 느낌 */
+        .btn {
+            background: var(--wood);
+            border: 2px solid var(--accent);
+            padding: 18px;
+            font-size: 22px;
+            font-family: 'Rye', cursive;
+            font-weight: bold;
+            color: var(--accent);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-transform: uppercase;
+        }
+        .btn:hover:not(:disabled) { 
+            background: var(--accent); 
+            color: var(--wood);
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
+        }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .btn-save { 
+            background: var(--danger); 
+            border-color: #fff;
+            color: white;
+            margin-top: 20px; 
+        }
+
+        #thumbnails {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .thumb {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            opacity: 0.6;
+            transition: 0.3s;
+        }
+        .thumb.selected { border-color: var(--accent); opacity: 1; transform: scale(1.05); }
+        
+        .status-msg { margin-top: 15px; color: var(--paper); font-size: 16px; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <img src="logo.png" alt="LOGO" class="logo" onerror="this.style.display='none'">
+        <h1>WHAT IS YOUR NAME</h1>
+    </header>
+
+    <div class="main-layout">
+        <div class="camera-section">
+            <div class="screen-container">
+                <video id="video" autoplay playsinline></video>
+                <div id="countdown" class="overlay-text"></div>
+            </div>
+            <div id="shotCounter" style="height: 30px; font-size: 20px; color: var(--accent); margin-bottom: 10px; font-family: 'Rye';"></div>
+            <button id="startBtn" class="btn">🔫 START SHOOTING</button>
+            <div id="thumbnails"></div>
+            <p class="status-msg">8장 중 가장 악명 높은 6장을 선택하시오.</p>
+        </div>
+
+        <div class="preview-section" style="text-align: center;">
+            <h2 style="margin-top:0; color: var(--accent); font-family: 'Rye'; font-size: 1.8rem;">WANTED POSTER</h2>
+            <canvas id="finalCanvas"></canvas>
+            <button id="saveBtn" class="btn btn-save" style="display:none;">📜 SAVE & SHARE (AIRDROP)</button>
+        </div>
+    </div>
+
+<script>
+    // [기존 스크립트 로직 동일하게 유지]
+    const video = document.getElementById('video');
+    const startBtn = document.getElementById('startBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const countdownEl = document.getElementById('countdown');
+    const thumbContainer = document.getElementById('thumbnails');
+    const finalCanvas = document.getElementById('finalCanvas');
+    const finalCtx = finalCanvas.getContext('2d');
+    const shotCounter = document.getElementById('shotCounter');
+
+    const bgImage = new Image();
+    bgImage.src = 'bg.png'; 
+    bgImage.onload = () => { drawFinal(); };
+
+    let capturedPhotos = [];
+    let selectedPhotos = [];
+
+    async function initCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { width: { ideal: 1280 }, height: { ideal: 720 } } 
+            });
+            video.srcObject = stream;
+            await video.play();
+        } catch (err) {
+            navigator.mediaDevices.getUserMedia({ video: true }).then(s => { video.srcObject = s; video.play(); });
+        }
+    }
+    initCamera();
+
+    startBtn.addEventListener('click', async () => {
+        capturedPhotos = [];
+        selectedPhotos = [];
+        thumbContainer.innerHTML = '';
+        startBtn.disabled = true;
+        saveBtn.style.display = 'none';
+        drawFinal();
+
+        for (let i = 1; i <= 8; i++) {
+            shotCounter.textContent = `READY... (${i} / 8)`;
+            for (let count = 5; count > 0; count--) {
+                countdownEl.textContent = count;
+                await new Promise(r => setTimeout(r, 1000));
+            }
+            countdownEl.textContent = "💥";
+            
+            const capCanvas = document.createElement('canvas');
+            capCanvas.width = 1024;
+            capCanvas.height = 768;
+            const ctx = capCanvas.getContext('2d');
+            ctx.translate(capCanvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0, capCanvas.width, capCanvas.height);
+            
+            const dataUrl = capCanvas.toDataURL('image/jpeg', 0.9);
+            capturedPhotos.push(dataUrl);
+
+            const img = document.createElement('img');
+            img.src = dataUrl;
+            img.className = 'thumb';
+            img.onclick = () => selectPhoto(dataUrl, img);
+            thumbContainer.appendChild(img);
+
+            await new Promise(r => setTimeout(r, 600));
+            countdownEl.textContent = "";
+        }
+        shotCounter.textContent = "CHOOSE YOUR 6 CUTS";
+        startBtn.disabled = false;
+    });
+
+    function selectPhoto(url, imgElement) {
+        if (imgElement.classList.contains('selected')) {
+            imgElement.classList.remove('selected');
+            selectedPhotos = selectedPhotos.filter(p => p !== url);
+        } else {
+            if (selectedPhotos.length >= 6) return;
+            imgElement.classList.add('selected');
+            selectedPhotos.push(url);
+        }
+        drawFinal();
+        saveBtn.style.display = selectedPhotos.length === 6 ? 'block' : 'none';
+    }
+
+    function drawFinal() {
+        if (!bgImage.complete) return;
+        finalCanvas.width = bgImage.naturalWidth;
+        finalCanvas.height = bgImage.naturalHeight;
+        finalCtx.drawImage(bgImage, 0, 0);
+
+        const marginX = finalCanvas.width * 0.08; 
+        const marginY = finalCanvas.height * 0.18; 
+        const gapX = 15; 
+        const gapY = 35;
+
+        const photoW = (finalCanvas.width - (marginX * 2) - gapX) / 2;
+        const photoH = (finalCanvas.height * 0.62) / 3; 
+
+        selectedPhotos.forEach((src, i) => {
+            const photoImg = new Image();
+            photoImg.src = src;
+            photoImg.onload = () => {
+                const x = marginX + (i % 2) * (photoW + gapX);
+                const y = marginY + Math.floor(i / 2) * (photoH + gapY);
+                
+                finalCtx.shadowColor = "rgba(0,0,0,0.6)";
+                finalCtx.shadowBlur = 15;
+                finalCtx.drawImage(photoImg, x, y, photoW, photoH);
+                finalCtx.shadowBlur = 0;
+            };
+        });
+    }
+
+    saveBtn.addEventListener('click', async () => {
+        const dataUrl = finalCanvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.download = 'WANTED_POSTER.png';
+        link.href = dataUrl;
+        link.click();
+
+        if (navigator.share) {
+            const blob = await (await fetch(dataUrl)).blob();
+            const file = new File([blob], 'wanted_6cut.png', { type: 'image/png' });
+            navigator.share({ 
+                files: [file], 
+                title: 'WANTED 6-CUT',
+                text: 'MY WANTED POSTER'
+            }).catch(() => {});
+        }
+    });
+</script>
+</body>
+</html>
