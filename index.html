@@ -12,8 +12,8 @@
       --ink: #21140b;
       --wood: #513018;
       --wood-dark: #23150d;
-      --paper: #f2deb1;
-      --paper-deep: #c59755;
+      --paper: #050505;
+      --paper-deep: #242424;
       --danger: #b93225;
       --green: #4daf6f;
       --panel: rgba(20, 16, 13, 0.88);
@@ -60,6 +60,97 @@
                calc(var(--pad) + env(safe-area-inset-right))
                calc(var(--pad) + env(safe-area-inset-bottom))
                calc(var(--pad) + env(safe-area-inset-left));
+    }
+
+    body:not(.frame-selected) .booth-view { display: none; }
+    body.frame-selected .frame-start { display: none; }
+
+    .frame-start {
+      min-height: calc(100dvh - var(--pad) * 2);
+      display: grid;
+      align-content: center;
+      gap: 24px;
+    }
+
+    .start-head {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .start-copy h1 { margin-bottom: 8px; }
+
+    .start-copy p {
+      margin: 0;
+      color: #f7efe0;
+      font-size: clamp(1rem, 2vw, 1.18rem);
+      font-weight: 700;
+    }
+
+    .frame-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .frame-card {
+      min-height: 220px;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      gap: 14px;
+      padding: 16px;
+      border: 2px solid rgba(245, 200, 66, 0.28);
+      border-radius: 12px;
+      background: rgba(20, 16, 13, 0.88);
+      color: #fff8e7;
+      box-shadow: 0 18px 42px rgba(0,0,0,0.38);
+      cursor: pointer;
+      text-align: left;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .frame-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent);
+      background: rgba(41, 28, 18, 0.94);
+    }
+
+    .frame-sample {
+      display: grid;
+      place-items: center;
+      min-height: 126px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #050505;
+      border: 8px solid rgba(107, 53, 24, 0.9);
+    }
+
+    .frame-sample canvas {
+      width: auto;
+      max-width: 240px;
+      max-height: 138px;
+      height: auto;
+      border: 0;
+      border-radius: 3px;
+      box-shadow: none;
+      background: #050505;
+    }
+
+    .frame-meta strong {
+      display: block;
+      color: var(--accent);
+      font-family: "Rye", cursive;
+      font-size: clamp(1.25rem, 2.6vw, 1.8rem);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .frame-meta span {
+      display: block;
+      color: #f7efe0;
+      font-size: 13px;
+      font-weight: 800;
     }
 
     .topbar {
@@ -429,7 +520,7 @@
       display: block;
       width: min(100%, 520px);
       height: auto;
-      border: 2px solid var(--paper);
+      border: 0;
       border-radius: 6px;
       background: var(--paper);
       box-shadow: 0 16px 36px rgba(0,0,0,0.38);
@@ -469,6 +560,7 @@
 
     @media (max-width: 1080px) {
       .layout { grid-template-columns: 1fr; }
+      .frame-grid { grid-template-columns: repeat(2, 1fr); }
       .poster-wrap { min-height: 320px; }
       .preview-panel { position: static; }
     }
@@ -488,6 +580,13 @@
         justify-items: center;
         text-align: center;
       }
+      .start-head {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        text-align: center;
+      }
+      .frame-grid { grid-template-columns: 1fr; }
+      .frame-card { min-height: 176px; }
       .brand-mark { width: 64px; height: 64px; }
       .session-badge { width: 100%; text-align: center; }
       .panel-header { align-items: flex-start; }
@@ -512,7 +611,46 @@
 </head>
 <body>
   <main class="app">
-    <header class="topbar">
+    <section class="frame-start" aria-label="프레임 선택">
+      <div class="start-head">
+        <div class="brand-mark" aria-label="Wanted Photo Booth logo">
+          <img src="logo.png" alt="" onerror="const parent = this.parentElement; this.remove(); parent.insertAdjacentHTML('beforeend', '<span class=&quot;brand-fallback&quot;>W</span>');" />
+        </div>
+        <div class="start-copy">
+          <h1>WHAT IS YOUR NAME</h1>
+          <p>원하는 프레임을 선택하고 촬영을 시작하세요.</p>
+        </div>
+      </div>
+
+      <div class="frame-grid">
+        <button class="frame-card" data-frame="single">
+          <span class="frame-sample" data-layout="single"><i class="sample-slot"></i></span>
+          <span class="frame-meta"><strong>1-CUT</strong><span>3장 촬영 / 1장 선택</span></span>
+        </button>
+        <button class="frame-card" data-frame="double">
+          <span class="frame-sample" data-layout="double"><i class="sample-slot"></i><i class="sample-slot"></i></span>
+          <span class="frame-meta"><strong>2-CUT</strong><span>4장 촬영 / 2장 선택</span></span>
+        </button>
+        <button class="frame-card" data-frame="classic4">
+          <span class="frame-sample" data-layout="four"><i class="sample-slot"></i><i class="sample-slot"></i><i class="sample-slot"></i><i class="sample-slot"></i></span>
+          <span class="frame-meta"><strong>4-CUT</strong><span>6장 촬영 / 4장 선택</span></span>
+        </button>
+        <button class="frame-card" data-frame="wide4">
+          <span class="frame-sample" data-layout="wide"><i class="sample-slot"></i><i class="sample-slot"></i><i class="sample-slot"></i><i class="sample-slot"></i></span>
+          <span class="frame-meta"><strong>WIDE 4</strong><span>6장 촬영 / 4장 선택</span></span>
+        </button>
+        <button class="frame-card" data-frame="six">
+          <span class="frame-sample" data-layout="six"><i class="sample-slot"></i><i class="sample-slot"></i><i class="sample-slot"></i><i class="sample-slot"></i><i class="sample-slot"></i><i class="sample-slot"></i></span>
+          <span class="frame-meta"><strong>6-CUT</strong><span>8장 촬영 / 6장 선택</span></span>
+        </button>
+        <button class="frame-card" data-frame="eight">
+          <span class="frame-sample" data-layout="eight"><i class="sample-slot"></i><i class="sample-slot"></i><i class="sample-slot"></i><i class="sample-slot"></i><i class="sample-slot"></i><i class="sample-slot"></i><i class="sample-slot"></i><i class="sample-slot"></i></span>
+          <span class="frame-meta"><strong>8-CUT</strong><span>10장 촬영 / 8장 선택</span></span>
+        </button>
+      </div>
+    </section>
+
+    <header class="topbar booth-view">
       <div class="brand-mark" aria-label="Wanted Photo Booth logo">
         <img src="logo.png" alt="" onerror="const parent = this.parentElement; this.remove(); parent.insertAdjacentHTML('beforeend', '<span class=&quot;brand-fallback&quot;>W</span>');" />
       </div>
@@ -523,10 +661,10 @@
       </div>
     </header>
 
-    <section class="layout">
+    <section class="layout booth-view">
       <div class="panel camera-panel">
         <div class="panel-header">
-          <h2 class="panel-title">Shooting Booth</h2>
+          <h2 class="panel-title" id="shootingTitle">Shooting Booth</h2>
           <div id="cameraStatus" class="live-status">
             <span class="live-dot"></span>
             <span>카메라 준비 중</span>
@@ -550,14 +688,15 @@
 
           <div class="workflow" aria-label="촬영 단계">
             <div class="step active" data-step="ready"><strong>Ready</strong><span>카메라 확인</span></div>
-            <div class="step" data-step="shoot"><strong>Shoot</strong><span>8장 촬영</span></div>
-            <div class="step" data-step="select"><strong>Select</strong><span>6장 선택</span></div>
+            <div class="step" data-step="shoot"><strong>Shoot</strong><span id="shootStepText">8장 촬영</span></div>
+            <div class="step" data-step="select"><strong>Select</strong><span id="selectStepText">6장 선택</span></div>
             <div class="step" data-step="save"><strong>Save</strong><span>저장/공유</span></div>
           </div>
 
           <div class="controls">
             <button id="startBtn" class="btn">START SHOOTING</button>
             <button id="retakeBtn" class="btn secondary" disabled>RESET</button>
+            <button id="changeFrameBtn" class="btn secondary">CHANGE FRAME</button>
           </div>
 
           <p id="notice" class="notice">카메라 권한을 허용한 뒤 촬영을 시작하세요.</p>
@@ -567,7 +706,7 @@
 
       <aside id="previewPanel" class="panel preview-panel">
         <div class="panel-header">
-          <h2 class="panel-title">Wanted Poster</h2>
+          <h2 class="panel-title" id="previewTitle">Wanted Poster</h2>
           <div class="live-status ready">
             <span class="live-dot"></span>
             <span id="selectionCount">0 / 6 선택</span>
@@ -600,6 +739,7 @@
     const retakeBtn = document.getElementById("retakeBtn");
     const saveBtn = document.getElementById("saveBtn");
     const shareBtn = document.getElementById("shareBtn");
+    const changeFrameBtn = document.getElementById("changeFrameBtn");
     const countdownEl = document.getElementById("countdown");
     const thumbs = document.getElementById("thumbs");
     const notice = document.getElementById("notice");
@@ -611,16 +751,26 @@
     const selectionCount = document.getElementById("selectionCount");
     const flash = document.getElementById("flash");
     const sessionId = document.getElementById("sessionId");
+    const shootingTitle = document.getElementById("shootingTitle");
+    const previewTitle = document.getElementById("previewTitle");
+    const shootStepText = document.getElementById("shootStepText");
+    const selectStepText = document.getElementById("selectStepText");
+    const frameCards = [...document.querySelectorAll(".frame-card")];
     const themeButtons = [...document.querySelectorAll(".option")];
     const steps = [...document.querySelectorAll(".step")];
 
-    const TOTAL_SHOTS = 8;
-    const REQUIRED_SELECTIONS = 6;
-    const POSTER_WIDTH = 1200;
-    const POSTER_HEIGHT = 1800;
+    const FRAME_PRESETS = {
+      single: { id: "single", label: "1-CUT", shots: 3, selections: 1, cols: 1, rows: 1, layout: "single", width: 1200, height: 1600, subtitle: "PROFILE WANTED" },
+      double: { id: "double", label: "2-CUT", shots: 4, selections: 2, cols: 1, rows: 2, layout: "strip", width: 760, height: 1600, subtitle: "DOUBLE WANTED" },
+      classic4: { id: "classic4", label: "4-CUT", shots: 6, selections: 4, cols: 1, rows: 4, layout: "strip", width: 640, height: 1900, subtitle: "CLASSIC FOUR CUTS" },
+      wide4: { id: "wide4", label: "WIDE 4", shots: 6, selections: 4, cols: 2, rows: 2, layout: "wide", width: 1600, height: 1200, subtitle: "WIDE FOUR CUTS" },
+      six: { id: "six", label: "6-CUT", shots: 8, selections: 6, cols: 2, rows: 3, layout: "grid", width: 1200, height: 1800, subtitle: "SELECTED SIX CUTS" },
+      eight: { id: "eight", label: "8-CUT", shots: 10, selections: 8, cols: 2, rows: 4, layout: "mini", width: 1160, height: 2100, subtitle: "MINI EIGHT CUTS" }
+    };
 
+    let currentFrame = FRAME_PRESETS.six;
     let capturedPhotos = [];
-    let selectedPhotos = Array(REQUIRED_SELECTIONS).fill(null);
+    let selectedPhotos = Array(currentFrame.selections).fill(null);
     let isShooting = false;
     let activeTheme = "classic";
     let stream = null;
@@ -647,6 +797,24 @@
       cameraStatus.querySelector("span:last-child").textContent = text;
     }
 
+    function applyFrame(frameId) {
+      currentFrame = FRAME_PRESETS[frameId] || FRAME_PRESETS.six;
+      document.body.classList.add("frame-selected");
+      sessionId.textContent = String(Math.floor(Math.random() * 9000) + 1000);
+      shootingTitle.textContent = `${currentFrame.label} Shooting`;
+      previewTitle.textContent = `${currentFrame.label} Poster`;
+      shootStepText.textContent = `${currentFrame.shots}장 촬영`;
+      selectStepText.textContent = `${currentFrame.selections}장 선택`;
+      resetSession();
+      if (!stream) initCamera();
+    }
+
+    function showFrameSelect() {
+      if (isShooting) return;
+      document.body.classList.remove("frame-selected");
+      resetSession();
+    }
+
     async function initCamera() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         setCameraStatus("카메라 미지원", false);
@@ -667,7 +835,7 @@
         await video.play();
         cameraPlaceholder.classList.add("hidden");
         setCameraStatus("카메라 연결됨", true);
-        notice.textContent = "START SHOOTING을 누르면 5초 간격으로 8장을 촬영합니다.";
+        notice.textContent = `START SHOOTING을 누르면 5초 간격으로 ${currentFrame.shots}장을 촬영합니다.`;
       } catch (error) {
         setCameraStatus("권한 필요", false);
         notice.textContent = "브라우저 주소창의 카메라 권한을 허용한 뒤 새로고침하세요.";
@@ -676,7 +844,7 @@
 
     function resetSession() {
       capturedPhotos = [];
-      selectedPhotos = Array(REQUIRED_SELECTIONS).fill(null);
+      selectedPhotos = Array(currentFrame.selections).fill(null);
       isShooting = false;
       thumbs.innerHTML = "";
       countdownEl.textContent = "";
@@ -685,13 +853,13 @@
       updateReadyState();
       setStep("ready");
       drawPoster();
-      notice.textContent = stream ? "START SHOOTING을 누르면 5초 간격으로 8장을 촬영합니다." : "카메라 권한을 허용한 뒤 촬영을 시작하세요.";
+      notice.textContent = stream ? `START SHOOTING을 누르면 5초 간격으로 ${currentFrame.shots}장을 촬영합니다.` : "카메라 권한을 허용한 뒤 촬영을 시작하세요.";
     }
 
     function updateReadyState() {
       const count = selectedCount();
-      const ready = count === REQUIRED_SELECTIONS;
-      selectionCount.textContent = `${count} / ${REQUIRED_SELECTIONS} 선택`;
+      const ready = count === currentFrame.selections;
+      selectionCount.textContent = `${count} / ${currentFrame.selections} 선택`;
       saveBtn.disabled = !ready;
       shareBtn.disabled = !ready || !navigator.share;
       if (ready) setStep("save");
@@ -773,8 +941,8 @@
       retakeBtn.disabled = true;
       setStep("shoot");
 
-      for (let i = 0; i < TOTAL_SHOTS; i += 1) {
-        notice.textContent = `${i + 1} / ${TOTAL_SHOTS} 촬영 준비`;
+      for (let i = 0; i < currentFrame.shots; i += 1) {
+        notice.textContent = `${i + 1} / ${currentFrame.shots} 촬영 준비`;
 
         for (let count = 5; count > 0; count -= 1) {
           countdownEl.textContent = count;
@@ -797,7 +965,7 @@
       startBtn.disabled = false;
       retakeBtn.disabled = false;
       setStep("select");
-      notice.textContent = "촬영 완료. 포스터에 넣을 6장을 순서대로 선택하세요.";
+      notice.textContent = `촬영 완료. 포스터에 넣을 ${currentFrame.selections}장을 순서대로 선택하세요.`;
     }
 
     function togglePhoto(photo, thumb) {
@@ -811,7 +979,7 @@
       } else {
         const emptySlot = firstEmptySlot();
         if (emptySlot < 0) {
-          notice.textContent = "6장까지 선택할 수 있습니다. 바꾸려면 선택된 사진을 먼저 해제하세요.";
+          notice.textContent = `${currentFrame.selections}장까지 선택할 수 있습니다. 바꾸려면 선택된 사진을 먼저 해제하세요.`;
           return;
         }
         selectedPhotos[emptySlot] = photo;
@@ -821,11 +989,11 @@
       syncSelectedThumbs();
 
       const count = selectedCount();
-      notice.textContent = count === REQUIRED_SELECTIONS
+      notice.textContent = count === currentFrame.selections
         ? "포스터가 완성되었습니다. 저장하거나 공유하세요."
-        : `${REQUIRED_SELECTIONS - count}장을 더 선택하세요.`;
+        : `${currentFrame.selections - count}장을 더 선택하세요.`;
 
-      if (count === REQUIRED_SELECTIONS) {
+      if (count === currentFrame.selections) {
         previewPanel.scrollIntoView({ behavior: "smooth", block: "start" });
       } else {
         setStep("select");
@@ -836,65 +1004,171 @@
     }
 
     function drawPaperTexture(ctx) {
-      ctx.fillStyle = "#f2deb1";
-      ctx.fillRect(0, 0, POSTER_WIDTH, POSTER_HEIGHT);
-      ctx.globalAlpha = 0.11;
-      for (let i = 0; i < 2600; i += 1) {
-        const shade = Math.random() > 0.5 ? "#6f4b25" : "#ffffff";
-        ctx.fillStyle = shade;
-        ctx.fillRect(Math.random() * POSTER_WIDTH, Math.random() * POSTER_HEIGHT, 1.5, 1.5);
-      }
-      ctx.globalAlpha = 1;
+      const posterW = currentFrame.width;
+      const posterH = currentFrame.height;
+      ctx.fillStyle = "#050505";
+      ctx.fillRect(0, 0, posterW, posterH);
     }
 
     function applyTheme(ctx) {
       const themes = {
-        classic: { border: "#6b3518", title: "#21140b", accent: "#b93225", photo: "#fff3d1" },
-        red: { border: "#8e241b", title: "#2a0d0a", accent: "#8e241b", photo: "#ffe1d6" },
-        mono: { border: "#27221d", title: "#16120f", accent: "#3b342e", photo: "#f1eee8" }
+        classic: { border: "#f5c842", title: "#f5c842", accent: "#f7efe0", photo: "#ffffff" },
+        red: { border: "#b93225", title: "#f7efe0", accent: "#f05a4a", photo: "#ffffff" },
+        mono: { border: "#f1eee8", title: "#f1eee8", accent: "#b8b8b8", photo: "#ffffff" }
       };
       return themes[activeTheme] || themes.classic;
     }
 
     function drawPosterFrame() {
-      finalCanvas.width = POSTER_WIDTH;
-      finalCanvas.height = POSTER_HEIGHT;
+      const posterW = currentFrame.width;
+      const posterH = currentFrame.height;
       const theme = applyTheme(finalCtx);
+      const titleSize = Math.round(Math.min(120, Math.max(74, posterW * 0.1)));
+      const subSize = Math.round(Math.min(44, Math.max(28, posterW * 0.036)));
+      const footerSize = Math.round(Math.min(32, Math.max(20, posterW * 0.028)));
+      const numberSize = Math.round(Math.min(36, Math.max(24, posterW * 0.032)));
+      const titleYMap = {
+        single: Math.round(posterH * 0.105),
+        strip: Math.round(posterH * 0.09),
+        wide: Math.round(posterH * 0.13),
+        grid: Math.round(posterH * 0.09),
+        mini: Math.round(posterH * 0.085)
+      };
+      const titleY = titleYMap[currentFrame.layout] || Math.round(posterH * 0.09);
+      const deadY = titleY + Math.round(titleSize * 0.55);
+      const footerY = currentFrame.layout === "wide" ? Math.round(posterH * 0.925) : posterH - Math.round(posterH * 0.085);
+      const numberY = currentFrame.layout === "wide" ? Math.round(posterH * 0.965) : posterH - Math.round(posterH * 0.045);
+
+      finalCanvas.width = posterW;
+      finalCanvas.height = posterH;
 
       drawPaperTexture(finalCtx);
-      finalCtx.strokeStyle = theme.border;
-      finalCtx.lineWidth = 30;
-      finalCtx.strokeRect(40, 40, POSTER_WIDTH - 80, POSTER_HEIGHT - 80);
-      finalCtx.lineWidth = 7;
-      finalCtx.strokeRect(76, 76, POSTER_WIDTH - 152, POSTER_HEIGHT - 152);
 
       finalCtx.textAlign = "center";
       finalCtx.fillStyle = theme.title;
-      finalCtx.font = "120px Rye, serif";
-      finalCtx.fillText("WANTED", POSTER_WIDTH / 2, 180);
+      finalCtx.font = `${titleSize}px Rye, serif`;
+      finalCtx.fillText("WANTED", posterW / 2, titleY);
 
       finalCtx.fillStyle = theme.accent;
-      finalCtx.font = "44px Poppins, sans-serif";
-      finalCtx.fillText("DEAD OR ALIVE", POSTER_WIDTH / 2, 242);
+      finalCtx.font = `${subSize}px Poppins, sans-serif`;
+      finalCtx.fillText("DEAD OR ALIVE", posterW / 2, deadY);
 
-      finalCtx.fillStyle = "rgba(33, 20, 11, 0.72)";
-      finalCtx.font = "700 32px Poppins, sans-serif";
-      finalCtx.fillText("SELECTED SIX CUTS", POSTER_WIDTH / 2, 1650);
+      finalCtx.fillStyle = "rgba(247, 239, 224, 0.78)";
+      finalCtx.font = `700 ${footerSize}px Poppins, sans-serif`;
+      finalCtx.fillText(currentFrame.subtitle, posterW / 2, footerY);
 
-      finalCtx.font = "36px Rye, serif";
-      finalCtx.fillText(`NO. ${sessionId.textContent}`, POSTER_WIDTH / 2, 1718);
+      finalCtx.font = `${numberSize}px Rye, serif`;
+      finalCtx.fillText(`NO. ${sessionId.textContent}`, posterW / 2, numberY);
+    }
+
+    function getFrameSlotRect(frame, index) {
+      const cols = frame.cols;
+      const rows = frame.rows;
+      const posterW = frame.width;
+      const posterH = frame.height;
+      const marginXMap = {
+        single: 90,
+        strip: Math.round(posterW * 0.13),
+        wide: Math.round(posterW * 0.055),
+        grid: Math.round(posterW * 0.09),
+        mini: Math.round(posterW * 0.05)
+      };
+      const marginX = marginXMap[frame.layout] || Math.round(posterW * 0.09);
+      const startYMap = {
+        single: Math.round(posterH * 0.22),
+        strip: Math.round(posterH * 0.18),
+        wide: Math.round(posterH * 0.17),
+        grid: Math.round(posterH * 0.18),
+        mini: Math.round(posterH * 0.15)
+      };
+      const bottomMap = {
+        single: Math.round(posterH * 0.78),
+        strip: Math.round(posterH * 0.88),
+        wide: Math.round(posterH * 0.86),
+        grid: Math.round(posterH * 0.88),
+        mini: Math.round(posterH * 0.91)
+      };
+      const startY = startYMap[frame.layout] || Math.round(posterH * 0.18);
+      const bottomY = bottomMap[frame.layout] || Math.round(posterH * 0.88);
+      const gapXMap = { wide: 28, mini: 20 };
+      const gapYMap = { wide: 26, mini: 18 };
+      const gapX = cols === 1 ? 0 : gapXMap[frame.layout] || 32;
+      const gapY = gapYMap[frame.layout] || (rows >= 4 ? Math.round(posterH * 0.012) : Math.round(posterH * 0.024));
+      const maxPhotoW = (posterW - marginX * 2 - gapX * (cols - 1)) / cols;
+      const maxPhotoH = (bottomY - startY - gapY * (rows - 1)) / rows;
+      let photoW = maxPhotoW;
+      let photoH = photoW * 0.75;
+
+      if (photoH > maxPhotoH) {
+        photoH = maxPhotoH;
+        photoW = photoH / 0.75;
+      }
+
+      if (frame.layout === "single") {
+        photoW = Math.min(posterW * 0.76, maxPhotoW);
+        photoH = photoW * 0.75;
+      }
+
+      const gridW = photoW * cols + gapX * (cols - 1);
+      const gridH = photoH * rows + gapY * (rows - 1);
+      const x0 = (posterW - gridW) / 2;
+      const y0 = startY + ((bottomY - startY) - gridH) / 2;
+      const x = x0 + (index % cols) * (photoW + gapX);
+      const y = y0 + Math.floor(index / cols) * (photoH + gapY);
+      return { x, y, width: photoW, height: photoH };
     }
 
     function getPhotoSlotRect(index) {
-      const marginX = 108;
-      const startY = 300;
-      const gapX = 32;
-      const gapY = 44;
-      const photoW = (POSTER_WIDTH - marginX * 2 - gapX) / 2;
-      const photoH = photoW * 0.75;
-      const x = marginX + (index % 2) * (photoW + gapX);
-      const y = startY + Math.floor(index / 2) * (photoH + gapY);
-      return { x, y, width: photoW, height: photoH };
+      return getFrameSlotRect(currentFrame, index);
+    }
+
+    function renderFramePreview(canvas, frame) {
+      const ctx = canvas.getContext("2d");
+      const theme = applyTheme();
+      const maxW = 240;
+      const maxH = 138;
+      const scale = Math.min(maxW / frame.width, maxH / frame.height);
+      const titleSize = Math.round(Math.min(120, Math.max(74, frame.width * 0.1)));
+      const subSize = Math.round(Math.min(44, Math.max(28, frame.width * 0.036)));
+      const titleYMap = {
+        single: Math.round(frame.height * 0.105),
+        strip: Math.round(frame.height * 0.09),
+        wide: Math.round(frame.height * 0.13),
+        grid: Math.round(frame.height * 0.09),
+        mini: Math.round(frame.height * 0.085)
+      };
+      const titleY = titleYMap[frame.layout] || Math.round(frame.height * 0.09);
+
+      canvas.width = frame.width;
+      canvas.height = frame.height;
+      canvas.style.width = `${Math.round(frame.width * scale)}px`;
+      canvas.style.height = `${Math.round(frame.height * scale)}px`;
+      ctx.fillStyle = "#050505";
+      ctx.fillRect(0, 0, frame.width, frame.height);
+      ctx.textAlign = "center";
+      ctx.fillStyle = theme.title;
+      ctx.font = `${titleSize}px Rye, serif`;
+      ctx.fillText("WANTED", frame.width / 2, titleY);
+      ctx.fillStyle = theme.accent;
+      ctx.font = `${subSize}px Poppins, sans-serif`;
+      ctx.fillText("DEAD OR ALIVE", frame.width / 2, titleY + Math.round(titleSize * 0.55));
+
+      for (let i = 0; i < frame.selections; i += 1) {
+        const rect = getFrameSlotRect(frame, i);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+      }
+    }
+
+    function renderFrameCards() {
+      frameCards.forEach((card) => {
+        const frame = FRAME_PRESETS[card.dataset.frame];
+        const sample = card.querySelector(".frame-sample");
+        if (!frame || !sample) return;
+        const canvas = document.createElement("canvas");
+        sample.replaceChildren(canvas);
+        renderFramePreview(canvas, frame);
+      });
     }
 
     function drawPhotoSlot(index, image) {
@@ -902,11 +1176,11 @@
       const { x, y, width: photoW, height: photoH } = getPhotoSlotRect(index);
 
       finalCtx.save();
-      finalCtx.shadowColor = "rgba(0,0,0,0.32)";
-      finalCtx.shadowBlur = 20;
-      finalCtx.shadowOffsetY = 12;
+      finalCtx.shadowColor = "rgba(0,0,0,0.18)";
+      finalCtx.shadowBlur = 10;
+      finalCtx.shadowOffsetY = 6;
       finalCtx.fillStyle = theme.photo;
-      finalCtx.fillRect(x - 12, y - 12, photoW + 24, photoH + 24);
+      finalCtx.fillRect(x, y, photoW, photoH);
       finalCtx.restore();
 
       if (image) {
@@ -927,19 +1201,12 @@
 
         finalCtx.drawImage(image, sx, sy, sw, sh, x, y, photoW, photoH);
       } else {
-        finalCtx.fillStyle = "rgba(33,20,11,0.10)";
+        finalCtx.fillStyle = "#ffffff";
         finalCtx.fillRect(x, y, photoW, photoH);
-        finalCtx.strokeStyle = "rgba(33,20,11,0.2)";
-        finalCtx.lineWidth = 4;
-        finalCtx.strokeRect(x, y, photoW, photoH);
-        finalCtx.fillStyle = "rgba(33,20,11,0.42)";
+        finalCtx.fillStyle = "rgba(0,0,0,0.32)";
         finalCtx.font = "700 54px Poppins, sans-serif";
         finalCtx.fillText(String(index + 1), x + photoW / 2, y + photoH / 2 + 18);
       }
-
-      finalCtx.strokeStyle = theme.border;
-      finalCtx.lineWidth = 5;
-      finalCtx.strokeRect(x, y, photoW, photoH);
     }
 
     function removePreviewSelection(index) {
@@ -950,7 +1217,7 @@
       setStep("select");
       updateReadyState();
       drawPoster();
-      notice.textContent = `${index + 1}번 칸의 사진 선택을 해제했습니다. ${REQUIRED_SELECTIONS - selectedCount()}장을 더 선택하세요.`;
+      notice.textContent = `${index + 1}번 칸의 사진 선택을 해제했습니다. ${currentFrame.selections - selectedCount()}장을 더 선택하세요.`;
     }
 
     function getCanvasSlotIndex(event) {
@@ -960,7 +1227,7 @@
       const x = (event.clientX - bounds.left) * scaleX;
       const y = (event.clientY - bounds.top) * scaleY;
 
-      for (let i = 0; i < REQUIRED_SELECTIONS; i += 1) {
+      for (let i = 0; i < currentFrame.selections; i += 1) {
         const rect = getPhotoSlotRect(i);
         const insideX = x >= rect.x && x <= rect.x + rect.width;
         const insideY = y >= rect.y && y <= rect.y + rect.height;
@@ -988,7 +1255,7 @@
       if (renderId !== posterRenderId) return;
 
       drawPosterFrame();
-      for (let i = 0; i < REQUIRED_SELECTIONS; i += 1) {
+      for (let i = 0; i < currentFrame.selections; i += 1) {
         drawPhotoSlot(i, loaded[i] || null);
       }
     }
@@ -1002,7 +1269,7 @@
       const blob = await getPosterBlob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.download = `wanted-${sessionId.textContent}.png`;
+      link.download = `wanted-${currentFrame.id}-${sessionId.textContent}.png`;
       link.href = url;
       link.click();
       URL.revokeObjectURL(url);
@@ -1012,8 +1279,8 @@
       if (!navigator.share) return;
       try {
         const blob = await getPosterBlob();
-        const file = new File([blob], `wanted-${sessionId.textContent}.png`, { type: "image/png" });
-        await navigator.share({ files: [file], title: "WANTED 6-CUT", text: "MY WANTED POSTER" });
+        const file = new File([blob], `wanted-${currentFrame.id}-${sessionId.textContent}.png`, { type: "image/png" });
+        await navigator.share({ files: [file], title: `WANTED ${currentFrame.label}`, text: "MY WANTED POSTER" });
       } catch (error) {
         notice.textContent = "공유가 취소되었습니다.";
       }
@@ -1023,8 +1290,13 @@
       button.addEventListener("click", () => {
         activeTheme = button.dataset.theme;
         themeButtons.forEach((item) => item.classList.toggle("active", item === button));
+        renderFrameCards();
         drawPoster();
       });
+    });
+
+    frameCards.forEach((button) => {
+      button.addEventListener("click", () => applyFrame(button.dataset.frame));
     });
 
     finalCanvas.addEventListener("click", (event) => {
@@ -1034,8 +1306,9 @@
 
     startBtn.addEventListener("click", startShooting);
     retakeBtn.addEventListener("click", resetSession);
+    changeFrameBtn.addEventListener("click", showFrameSelect);
 
-    initCamera();
+    renderFrameCards();
     drawPoster();
   </script>
 </body>
