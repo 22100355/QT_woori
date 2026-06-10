@@ -620,7 +620,7 @@
     const POSTER_HEIGHT = 1800;
 
     let capturedPhotos = [];
-    let selectedPhotos = [];
+    let selectedPhotos = Array(REQUIRED_SELECTIONS).fill(null);
     let isShooting = false;
     let activeTheme = "classic";
     let stream = null;
@@ -628,6 +628,14 @@
     sessionId.textContent = String(Math.floor(Math.random() * 9000) + 1000);
 
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    function selectedCount() {
+      return selectedPhotos.filter(Boolean).length;
+    }
+
+    function firstEmptySlot() {
+      return selectedPhotos.findIndex((photo) => !photo);
+    }
 
     function setStep(name) {
       steps.forEach((step) => step.classList.toggle("active", step.dataset.step === name));
@@ -667,7 +675,7 @@
 
     function resetSession() {
       capturedPhotos = [];
-      selectedPhotos = [];
+      selectedPhotos = Array(REQUIRED_SELECTIONS).fill(null);
       isShooting = false;
       thumbs.innerHTML = "";
       countdownEl.textContent = "";
@@ -680,8 +688,9 @@
     }
 
     function updateReadyState() {
-      const ready = selectedPhotos.length === REQUIRED_SELECTIONS;
-      selectionCount.textContent = `${selectedPhotos.length} / ${REQUIRED_SELECTIONS} 선택`;
+      const count = selectedCount();
+      const ready = count === REQUIRED_SELECTIONS;
+      selectionCount.textContent = `${count} / ${REQUIRED_SELECTIONS} 선택`;
       saveBtn.disabled = !ready;
       shareBtn.disabled = !ready || !navigator.share;
       if (ready) setStep("save");
@@ -747,7 +756,7 @@
 
     function syncSelectedThumbs() {
       [...thumbs.children].forEach((item) => {
-        const order = selectedPhotos.findIndex((selected) => selected.id === item.dataset.photoId);
+        const order = selectedPhotos.findIndex((selected) => selected && selected.id === item.dataset.photoId);
         item.classList.toggle("selected", order >= 0);
         if (order >= 0) item.dataset.order = String(order + 1);
         else item.removeAttribute("data-order");
@@ -793,27 +802,29 @@
     function togglePhoto(photo, thumb) {
       if (isShooting) return;
 
-      const selectedIndex = selectedPhotos.findIndex((selected) => selected.id === photo.id);
+      const selectedIndex = selectedPhotos.findIndex((selected) => selected && selected.id === photo.id);
       if (selectedIndex >= 0) {
-        selectedPhotos.splice(selectedIndex, 1);
+        selectedPhotos[selectedIndex] = null;
         thumb.classList.remove("selected");
         thumb.removeAttribute("data-order");
       } else {
-        if (selectedPhotos.length >= REQUIRED_SELECTIONS) {
+        const emptySlot = firstEmptySlot();
+        if (emptySlot < 0) {
           notice.textContent = "6장까지 선택할 수 있습니다. 바꾸려면 선택된 사진을 먼저 해제하세요.";
           return;
         }
-        selectedPhotos.push(photo);
+        selectedPhotos[emptySlot] = photo;
         thumb.classList.add("selected");
       }
 
       syncSelectedThumbs();
 
-      notice.textContent = selectedPhotos.length === REQUIRED_SELECTIONS
+      const count = selectedCount();
+      notice.textContent = count === REQUIRED_SELECTIONS
         ? "포스터가 완성되었습니다. 저장하거나 공유하세요."
-        : `${REQUIRED_SELECTIONS - selectedPhotos.length}장을 더 선택하세요.`;
+        : `${REQUIRED_SELECTIONS - count}장을 더 선택하세요.`;
 
-      if (selectedPhotos.length === REQUIRED_SELECTIONS) {
+      if (count === REQUIRED_SELECTIONS) {
         previewPanel.scrollIntoView({ behavior: "smooth", block: "start" });
       } else {
         setStep("select");
@@ -933,12 +944,12 @@
     function removePreviewSelection(index) {
       if (!selectedPhotos[index]) return;
 
-      selectedPhotos.splice(index, 1);
+      selectedPhotos[index] = null;
       syncSelectedThumbs();
       setStep("select");
       updateReadyState();
       drawPoster();
-      notice.textContent = `${index + 1}번 칸의 사진 선택을 해제했습니다. ${REQUIRED_SELECTIONS - selectedPhotos.length}장을 더 선택하세요.`;
+      notice.textContent = `${index + 1}번 칸의 사진 선택을 해제했습니다. ${REQUIRED_SELECTIONS - selectedCount()}장을 더 선택하세요.`;
     }
 
     function getCanvasSlotIndex(event) {
@@ -970,7 +981,7 @@
     async function drawPoster() {
       drawPosterFrame();
 
-      const loaded = await Promise.all(selectedPhotos.map((photo) => loadImage(photo.url)));
+      const loaded = await Promise.all(selectedPhotos.map((photo) => photo ? loadImage(photo.url) : Promise.resolve(null)));
       for (let i = 0; i < REQUIRED_SELECTIONS; i += 1) {
         drawPhotoSlot(i, loaded[i] || null);
       }
