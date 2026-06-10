@@ -714,14 +714,18 @@
       return capCanvas.toDataURL("image/jpeg", 0.92);
     }
 
-    function addThumb(url, index) {
+    function addThumb(photo, index) {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "thumb";
       button.dataset.number = String(index + 1);
+      button.dataset.photoId = photo.id;
       button.setAttribute("aria-label", `${index + 1}번째 사진 선택`);
-      button.innerHTML = `<img src="${url}" alt="">`;
-      button.addEventListener("click", () => togglePhoto(url, button));
+      const img = document.createElement("img");
+      img.src = photo.url;
+      img.alt = "";
+      button.appendChild(img);
+      button.addEventListener("click", () => togglePhoto(photo, button));
       thumbs.appendChild(button);
     }
 
@@ -744,7 +748,10 @@
 
         countdownEl.textContent = "BANG";
         flashScreen();
-        const photo = captureFrame();
+        const photo = {
+          id: `shot-${i + 1}-${Date.now()}`,
+          url: captureFrame()
+        };
         capturedPhotos.push(photo);
         addThumb(photo, i);
         await sleep(520);
@@ -758,10 +765,10 @@
       notice.textContent = "촬영 완료. 포스터에 넣을 6장을 순서대로 선택하세요.";
     }
 
-    function togglePhoto(url, thumb) {
+    function togglePhoto(photo, thumb) {
       if (isShooting) return;
 
-      const selectedIndex = selectedPhotos.indexOf(url);
+      const selectedIndex = selectedPhotos.findIndex((selected) => selected.id === photo.id);
       if (selectedIndex >= 0) {
         selectedPhotos.splice(selectedIndex, 1);
         thumb.classList.remove("selected");
@@ -771,13 +778,12 @@
           notice.textContent = "6장까지 선택할 수 있습니다. 바꾸려면 선택된 사진을 먼저 해제하세요.";
           return;
         }
-        selectedPhotos.push(url);
+        selectedPhotos.push(photo);
         thumb.classList.add("selected");
       }
 
       [...thumbs.children].forEach((item) => {
-        const img = item.querySelector("img");
-        const order = selectedPhotos.indexOf(img.src);
+        const order = selectedPhotos.findIndex((selected) => selected.id === item.dataset.photoId);
         if (order >= 0) item.dataset.order = String(order + 1);
         else item.removeAttribute("data-order");
       });
@@ -910,7 +916,7 @@
     async function drawPoster() {
       drawPosterFrame();
 
-      const loaded = await Promise.all(selectedPhotos.map(loadImage));
+      const loaded = await Promise.all(selectedPhotos.map((photo) => loadImage(photo.url)));
       for (let i = 0; i < REQUIRED_SELECTIONS; i += 1) {
         drawPhotoSlot(i, loaded[i] || null);
       }
