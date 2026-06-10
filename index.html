@@ -3,43 +3,58 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>WANTED PHOTO BOOTH (6-CUT)</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Black+Han+Sans&family=Rye&display=swap" rel="stylesheet">
-
+  <title>Wanted Photo Booth</title>
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Poppins:wght@400;600;700;800&family=Rye&display=swap" rel="stylesheet">
   <style>
     :root {
-      --accent: #ffcc00;
-      --wood: #4d2a15;
-      --paper: #f4e4bc;
-      --danger: #c0392b;
+      --accent: #f5c842;
+      --accent-strong: #ffdd57;
+      --ink: #21140b;
+      --wood: #513018;
+      --wood-dark: #23150d;
+      --paper: #f2deb1;
+      --paper-deep: #c59755;
+      --danger: #b93225;
+      --green: #4daf6f;
+      --panel: rgba(20, 16, 13, 0.88);
+      --panel-soft: rgba(55, 36, 23, 0.72);
+      --line: rgba(245, 200, 66, 0.28);
       --pad: 20px;
     }
 
     * { box-sizing: border-box; }
 
+    html { color-scheme: dark; }
+
     body {
-      font-family: 'Poppins', 'Black Han Sans', sans-serif;
-      background: url('main_bg.jpeg') no-repeat center center fixed;
-      background-size: cover;
-      color: white;
+      min-height: 100dvh;
       margin: 0;
-      min-height: 100dvh;   /* 모바일 주소창 대응 */
-      padding: 0;           /* container가 패딩 관리 */
-      display: block;
+      font-family: "Poppins", "Black Han Sans", sans-serif;
+      color: #fff8e7;
+      background:
+        linear-gradient(rgba(17, 9, 4, 0.56), rgba(17, 9, 4, 0.72)),
+        url("main_bg.jpeg"),
+        radial-gradient(circle at top left, #74451e, #170d08 60%);
+      background-size: cover, cover, cover;
+      background-position: center;
     }
 
-    body::before {
+    body::after {
       content: "";
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.4);
-      z-index: -1;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: 36px 36px;
+      mix-blend-mode: soft-light;
     }
 
-    /* ✅ 전체 레이아웃 패딩/안전영역 */
-    .container {
-      width: 100%;
-      max-width: 1400px;
+    button, input { font: inherit; }
+
+    .app {
+      width: min(1500px, 100%);
       margin: 0 auto;
       padding: calc(var(--pad) + env(safe-area-inset-top))
                calc(var(--pad) + env(safe-area-inset-right))
@@ -47,381 +62,899 @@
                calc(var(--pad) + env(safe-area-inset-left));
     }
 
-    .header {
-      display: flex;
+    .topbar {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
       align-items: center;
-      gap: 20px;
-      margin-bottom: 26px;
-      text-shadow: 3px 3px 10px rgba(0,0,0,0.8);
+      gap: 18px;
+      margin-bottom: 18px;
     }
 
-    .logo { width: 80px; height: 80px; object-fit: contain; }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 76px;
+      height: 76px;
+      border: 3px solid var(--accent);
+      border-radius: 50%;
+      background: rgba(33, 20, 11, 0.82);
+      box-shadow: inset 0 0 0 5px rgba(245, 200, 66, 0.12), 0 12px 30px rgba(0,0,0,0.35);
+      overflow: hidden;
+    }
+
+    .brand-mark img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .brand-fallback {
+      font-family: "Rye", cursive;
+      font-size: 28px;
+      color: var(--accent);
+    }
 
     h1 {
-      font-family: 'Rye', cursive;
-      font-size: clamp(1.8rem, 5.5vw, 3.5rem); /* ✅ 모바일 자동 축소 */
       margin: 0;
+      font-family: "Rye", cursive;
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 0.98;
+      letter-spacing: 0;
       color: var(--accent);
-      letter-spacing: 3px;
-      line-height: 1.05;
-      text-align: left;
+      text-shadow: 0 5px 0 rgba(0,0,0,0.3), 0 0 24px rgba(245, 200, 66, 0.25);
       word-break: keep-all;
     }
 
-    .main-layout {
+    .session-badge {
+      min-width: 148px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(18, 12, 8, 0.72);
+      text-align: right;
+      box-shadow: 0 10px 26px rgba(0,0,0,0.25);
+    }
+
+    .session-badge span {
+      display: block;
+      color: var(--paper);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .session-badge strong {
+      color: var(--accent-strong);
+      font-family: "Rye", cursive;
+      font-size: 20px;
+    }
+
+    .layout {
       display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 30px;
-      width: 100%;
-    }
-    @media (max-width: 1000px) {
-      .main-layout { grid-template-columns: 1fr; gap: 18px; }
+      grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+      gap: 22px;
+      align-items: start;
     }
 
-    .camera-section, .preview-section {
-      background: rgba(26, 26, 26, 0.85);
-      padding: 25px;
-      border-radius: 24px;
+    .panel {
       border: 3px solid var(--wood);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.7);
-      backdrop-filter: blur(5px);
+      border-radius: 16px;
+      background: var(--panel);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.58);
+      overflow: clip;
     }
 
-    .screen-container {
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(90deg, rgba(81,48,24,0.88), rgba(31,18,10,0.76));
+    }
+
+    .panel-title {
+      margin: 0;
+      font-family: "Rye", cursive;
+      font-size: clamp(1.15rem, 2vw, 1.55rem);
+      color: var(--accent);
+      letter-spacing: 0;
+    }
+
+    .live-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--paper);
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .live-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--danger);
+      box-shadow: 0 0 0 5px rgba(185, 50, 37, 0.18);
+    }
+
+    .live-status.ready .live-dot {
+      background: var(--green);
+      box-shadow: 0 0 0 5px rgba(77, 175, 111, 0.18);
+    }
+
+    .camera-body { padding: 18px; }
+
+    .screen {
       position: relative;
       width: 100%;
       aspect-ratio: 4 / 3;
-      background: #000;
-      border-radius: 16px;
       overflow: hidden;
-      margin-bottom: 15px;
       border: 5px solid var(--wood);
-      max-height: 52dvh; /* ✅ 모바일에서 너무 커지지 않게 */
+      border-radius: 12px;
+      background:
+        radial-gradient(circle at center, rgba(255,255,255,0.06), transparent 45%),
+        #080604;
+      max-height: 58dvh;
     }
 
-    #video {
+    video {
+      display: block;
       width: 100%;
       height: 100%;
       object-fit: cover;
       transform: scaleX(-1);
     }
 
-    .overlay-text {
+    .camera-placeholder {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: clamp(64px, 16vw, 120px);
-      font-family: 'Rye', cursive;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+      text-align: center;
+      color: rgba(255,248,231,0.8);
+      background:
+        linear-gradient(45deg, rgba(245,200,66,0.06) 25%, transparent 25% 50%, rgba(245,200,66,0.06) 50% 75%, transparent 75%),
+        #100b07;
+      background-size: 28px 28px;
+    }
+
+    .camera-placeholder.hidden { display: none; }
+
+    .camera-placeholder strong {
+      display: block;
+      margin-bottom: 8px;
       color: var(--accent);
-      text-shadow: 0 0 30px rgba(255, 204, 0, 0.6);
-      z-index: 10;
+      font-family: "Rye", cursive;
+      font-size: clamp(1.4rem, 4vw, 2.5rem);
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+      background: radial-gradient(circle at center, transparent 36%, rgba(0,0,0,0.18));
+    }
+
+    .countdown {
+      font-family: "Rye", cursive;
+      font-size: clamp(5rem, 18vw, 10rem);
+      line-height: 1;
+      color: var(--accent);
+      text-shadow: 0 0 26px rgba(245, 200, 66, 0.72), 0 8px 0 rgba(0,0,0,0.42);
+    }
+
+    .flash {
+      position: absolute;
+      inset: 0;
+      background: #fff;
+      opacity: 0;
       pointer-events: none;
     }
 
-    #finalCanvas {
-      width: 100%;
-      height: auto;
-      max-width: 520px;
-      border-radius: 6px;
-      background: #222;
-      border: 2px solid var(--paper);
+    .flash.on { animation: flash 420ms ease-out; }
+
+    @keyframes flash {
+      0% { opacity: 0; }
+      18% { opacity: 0.88; }
+      100% { opacity: 0; }
+    }
+
+    .workflow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .step {
+      min-height: 58px;
+      padding: 10px;
+      border: 1px solid rgba(245, 200, 66, 0.18);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.055);
+      color: rgba(255,248,231,0.66);
+    }
+
+    .step strong {
+      display: block;
+      color: currentColor;
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    .step span {
+      color: inherit;
+      font-size: 12px;
+    }
+
+    .step.active {
+      border-color: var(--accent);
+      background: rgba(245, 200, 66, 0.14);
+      color: var(--accent-strong);
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
     }
 
     .btn {
-      background: var(--wood);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 54px;
+      padding: 12px 14px;
       border: 2px solid var(--accent);
-      padding: 14px 16px;
-      font-size: clamp(16px, 4.8vw, 22px);
-      font-family: 'Rye', cursive;
-      font-weight: bold;
+      border-radius: 8px;
+      background: var(--wood);
       color: var(--accent);
-      border-radius: 10px;
+      font-family: "Rye", "Black Han Sans", cursive;
+      font-size: clamp(0.98rem, 2.2vw, 1.35rem);
+      font-weight: 700;
       cursor: pointer;
-      transition: all 0.25s ease;
-      width: 100%;
       text-transform: uppercase;
+      transition: transform 160ms ease, background 160ms ease, color 160ms ease, opacity 160ms ease;
       touch-action: manipulation;
     }
+
     .btn:hover:not(:disabled) {
       background: var(--accent);
-      color: var(--wood);
-      box-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
+      color: var(--ink);
     }
-    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
-    .btn:active { transform: translateY(1px); }
 
-    .btn-save {
-      background: var(--danger);
-      border-color: #fff;
-      color: white;
+    .btn:active:not(:disabled) { transform: translateY(1px); }
+    .btn:disabled { opacity: 0.48; cursor: not-allowed; }
+    .btn.secondary { border-color: rgba(255,248,231,0.44); color: #fff8e7; background: rgba(255,255,255,0.08); }
+    .btn.danger { border-color: #fff8e7; background: var(--danger); color: #fff8e7; }
+
+    .notice {
+      min-height: 26px;
+      margin: 12px 0 0;
+      color: var(--paper);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .thumbs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
       margin-top: 16px;
     }
 
-    /* ✅ 모바일에서 저장 버튼이 아래에 잘 붙어 보이게 */
-    @media (max-width: 520px){
-      #saveBtn{
-        position: sticky;
-        bottom: calc(12px + env(safe-area-inset-bottom));
-        z-index: 20;
-      }
-      .camera-section, .preview-section{
-        padding: 16px;
-        border-radius: 18px;
-        border-width: 2px;
-      }
-      .screen-container{
-        border-width: 4px;
-        border-radius: 14px;
-      }
-      .header{
-        flex-direction: column;
-        gap: 10px;
-        margin-bottom: 18px;
-      }
-      .logo{ width: 64px; height: 64px; }
-      h1{ text-align: center; }
-      body{ background-attachment: scroll; } /* ✅ 모바일 fixed 배경 버벅임 방지 */
-    }
-
-    #thumbnails {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-top: 20px;
-    }
-    @media (max-width: 720px){
-      #thumbnails{ grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    }
-    @media (max-width: 420px){
-      #thumbnails{ grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    }
-
     .thumb {
-      width: 100%;
-      aspect-ratio: 4/3;
-      object-fit: cover;
-      border-radius: 6px;
-      cursor: pointer;
+      position: relative;
+      display: block;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
       border: 3px solid transparent;
-      opacity: 0.75;
-      transition: 0.25s;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.06);
+      cursor: pointer;
+      opacity: 0.72;
+      transition: transform 160ms ease, opacity 160ms ease, border-color 160ms ease;
     }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .thumb::before {
+      content: attr(data-number);
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.62);
+      color: #fff8e7;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
     .thumb.selected {
-      border-color: var(--accent);
       opacity: 1;
-      transform: scale(1.03);
+      border-color: var(--accent);
+      transform: translateY(-2px);
     }
 
-    .status-msg {
-      margin-top: 15px;
-      color: var(--paper);
-      font-size: 16px;
-      font-weight: 600;
+    .thumb.selected::after {
+      content: attr(data-order);
+      position: absolute;
+      right: 6px;
+      bottom: 6px;
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--ink);
+      font-weight: 900;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.35);
     }
 
-    /* iOS 입력 확대 방지(안전) */
-    input, textarea, button { font-size: 16px; }
+    .preview-body {
+      padding: 18px;
+      text-align: center;
+    }
+
+    .poster-wrap {
+      display: grid;
+      place-items: center;
+      min-height: 420px;
+      padding: 12px;
+      border: 1px dashed rgba(245, 200, 66, 0.32);
+      border-radius: 10px;
+      background:
+        linear-gradient(rgba(255,255,255,0.04), rgba(0,0,0,0.08)),
+        rgba(0,0,0,0.16);
+    }
+
+    canvas {
+      display: block;
+      width: min(100%, 520px);
+      height: auto;
+      border: 2px solid var(--paper);
+      border-radius: 6px;
+      background: var(--paper);
+      box-shadow: 0 16px 36px rgba(0,0,0,0.38);
+    }
+
+    .save-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .mini-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .option {
+      min-height: 42px;
+      border: 1px solid rgba(245, 200, 66, 0.24);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.055);
+      color: #fff8e7;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .option.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(245, 200, 66, 0.12);
+    }
+
+    @media (max-width: 1080px) {
+      .layout { grid-template-columns: 1fr; }
+      .poster-wrap { min-height: 320px; }
+      .preview-panel { position: static; }
+    }
+
+    @media (min-width: 1081px) {
+      .preview-panel {
+        position: sticky;
+        top: calc(16px + env(safe-area-inset-top));
+      }
+    }
+
+    @media (max-width: 720px) {
+      :root { --pad: 12px; }
+      body { background-attachment: scroll; }
+      .topbar {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        text-align: center;
+      }
+      .brand-mark { width: 64px; height: 64px; }
+      .session-badge { width: 100%; text-align: center; }
+      .panel-header { align-items: flex-start; }
+      .workflow { grid-template-columns: repeat(2, 1fr); }
+      .controls, .save-row { grid-template-columns: 1fr; }
+      .thumbs { grid-template-columns: repeat(3, 1fr); }
+      .screen { border-width: 4px; }
+      .save-row {
+        position: sticky;
+        bottom: calc(10px + env(safe-area-inset-bottom));
+        z-index: 5;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .thumbs { grid-template-columns: repeat(2, 1fr); }
+      .mini-options { grid-template-columns: 1fr; }
+      .panel-header { flex-direction: column; }
+      .live-status { white-space: normal; }
+    }
   </style>
 </head>
-
 <body>
-  <div class="container">
-    <header class="header">
-      <img src="logo.png" alt="LOGO" class="logo" onerror="this.style.display='none'">
+  <main class="app">
+    <header class="topbar">
+      <div class="brand-mark" aria-label="Wanted Photo Booth logo">
+        <img src="logo.png" alt="" onerror="const parent = this.parentElement; this.remove(); parent.insertAdjacentHTML('beforeend', '<span class=&quot;brand-fallback&quot;>W</span>');" />
+      </div>
       <h1>WHAT IS YOUR NAME</h1>
+      <div class="session-badge">
+        <span>Session</span>
+        <strong id="sessionId">0001</strong>
+      </div>
     </header>
 
-    <div class="main-layout">
-      <div class="camera-section">
-        <div class="screen-container">
-          <video id="video" autoplay playsinline></video>
-          <div id="countdown" class="overlay-text"></div>
+    <section class="layout">
+      <div class="panel camera-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Shooting Booth</h2>
+          <div id="cameraStatus" class="live-status">
+            <span class="live-dot"></span>
+            <span>카메라 준비 중</span>
+          </div>
         </div>
 
-        <div id="shotCounter" style="height: 30px; font-size: 20px; color: var(--accent); margin-bottom: 10px; font-family: 'Rye';"></div>
+        <div class="camera-body">
+          <div class="screen">
+            <video id="video" autoplay playsinline muted></video>
+            <div id="cameraPlaceholder" class="camera-placeholder">
+              <div>
+                <strong>CAMERA STANDBY</strong>
+                <span>권한을 허용하면 촬영 화면이 표시됩니다.</span>
+              </div>
+            </div>
+            <div class="overlay">
+              <div id="countdown" class="countdown"></div>
+            </div>
+            <div id="flash" class="flash"></div>
+          </div>
 
-        <button id="startBtn" class="btn">🔫 START SHOOTING</button>
+          <div class="workflow" aria-label="촬영 단계">
+            <div class="step active" data-step="ready"><strong>Ready</strong><span>카메라 확인</span></div>
+            <div class="step" data-step="shoot"><strong>Shoot</strong><span>8장 촬영</span></div>
+            <div class="step" data-step="select"><strong>Select</strong><span>6장 선택</span></div>
+            <div class="step" data-step="save"><strong>Save</strong><span>저장/공유</span></div>
+          </div>
 
-        <div id="thumbnails"></div>
-        <p class="status-msg">8장 중 가장 악명 높은 6장을 선택하시오.</p>
+          <div class="controls">
+            <button id="startBtn" class="btn">START SHOOTING</button>
+            <button id="retakeBtn" class="btn secondary" disabled>RESET</button>
+          </div>
+
+          <p id="notice" class="notice">카메라 권한을 허용한 뒤 촬영을 시작하세요.</p>
+          <div id="thumbs" class="thumbs" aria-label="촬영된 사진 목록"></div>
+        </div>
       </div>
 
-      <div class="preview-section" id="previewSection" style="text-align: center;">
-        <h2 style="margin-top:0; color: var(--accent); font-family: 'Rye'; font-size: 1.8rem;">WANTED POSTER</h2>
-        <canvas id="finalCanvas"></canvas>
-        <button id="saveBtn" class="btn btn-save" style="display:none;">📜 SAVE & SHARE (AIRDROP)</button>
-      </div>
-    </div>
-  </div>
+      <aside id="previewPanel" class="panel preview-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Wanted Poster</h2>
+          <div class="live-status ready">
+            <span class="live-dot"></span>
+            <span id="selectionCount">0 / 6 선택</span>
+          </div>
+        </div>
+
+        <div class="preview-body">
+          <div class="poster-wrap">
+            <canvas id="finalCanvas" width="1200" height="1800"></canvas>
+          </div>
+
+          <div class="mini-options" aria-label="프레임 스타일 선택">
+            <button class="option active" data-theme="classic">CLASSIC</button>
+            <button class="option" data-theme="red">RED</button>
+            <button class="option" data-theme="mono">MONO</button>
+          </div>
+
+          <div class="save-row">
+            <button id="saveBtn" class="btn danger" disabled>SAVE PNG</button>
+            <button id="shareBtn" class="btn secondary" disabled>SHARE</button>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
 
   <script>
-    const video = document.getElementById('video');
-    const startBtn = document.getElementById('startBtn');
-    const saveBtn = document.getElementById('saveBtn');
-    const countdownEl = document.getElementById('countdown');
-    const thumbContainer = document.getElementById('thumbnails');
-    const finalCanvas = document.getElementById('finalCanvas');
-    const finalCtx = finalCanvas.getContext('2d');
-    const shotCounter = document.getElementById('shotCounter');
-    const previewSection = document.getElementById('previewSection');
+    const video = document.getElementById("video");
+    const startBtn = document.getElementById("startBtn");
+    const retakeBtn = document.getElementById("retakeBtn");
+    const saveBtn = document.getElementById("saveBtn");
+    const shareBtn = document.getElementById("shareBtn");
+    const countdownEl = document.getElementById("countdown");
+    const thumbs = document.getElementById("thumbs");
+    const notice = document.getElementById("notice");
+    const finalCanvas = document.getElementById("finalCanvas");
+    const finalCtx = finalCanvas.getContext("2d");
+    const previewPanel = document.getElementById("previewPanel");
+    const cameraStatus = document.getElementById("cameraStatus");
+    const cameraPlaceholder = document.getElementById("cameraPlaceholder");
+    const selectionCount = document.getElementById("selectionCount");
+    const flash = document.getElementById("flash");
+    const sessionId = document.getElementById("sessionId");
+    const themeButtons = [...document.querySelectorAll(".option")];
+    const steps = [...document.querySelectorAll(".step")];
 
-    const bgImage = new Image();
-    bgImage.src = 'bg.png';
-    bgImage.onload = () => { drawFinal(); };
+    const TOTAL_SHOTS = 8;
+    const REQUIRED_SELECTIONS = 6;
+    const POSTER_WIDTH = 1200;
+    const POSTER_HEIGHT = 1800;
 
     let capturedPhotos = [];
     let selectedPhotos = [];
+    let isShooting = false;
+    let activeTheme = "classic";
+    let stream = null;
+
+    sessionId.textContent = String(Math.floor(Math.random() * 9000) + 1000);
+
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    function setStep(name) {
+      steps.forEach((step) => step.classList.toggle("active", step.dataset.step === name));
+    }
+
+    function setCameraStatus(text, ready = false) {
+      cameraStatus.classList.toggle("ready", ready);
+      cameraStatus.querySelector("span:last-child").textContent = text;
+    }
 
     async function initCamera() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setCameraStatus("카메라 미지원", false);
+        notice.textContent = "현재 브라우저는 카메라 촬영을 지원하지 않습니다.";
+        return;
+      }
+
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
+        stream = await navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: "user",
             width: { ideal: 1280 },
-            height: { ideal: 720 }
+            height: { ideal: 960 }
           },
           audio: false
         });
         video.srcObject = stream;
         await video.play();
-      } catch (err) {
-        // fallback
-        navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(s => {
-          video.srcObject = s;
-          video.play();
-        }).catch(() => {
-          alert("카메라 접근이 필요합니다. 브라우저 권한을 허용해주세요.");
-        });
+        cameraPlaceholder.classList.add("hidden");
+        setCameraStatus("카메라 연결됨", true);
+        notice.textContent = "START SHOOTING을 누르면 5초 간격으로 8장을 촬영합니다.";
+      } catch (error) {
+        setCameraStatus("권한 필요", false);
+        notice.textContent = "브라우저 주소창의 카메라 권한을 허용한 뒤 새로고침하세요.";
       }
     }
-    initCamera();
 
-    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-    startBtn.addEventListener('click', async () => {
+    function resetSession() {
       capturedPhotos = [];
       selectedPhotos = [];
-      thumbContainer.innerHTML = '';
+      isShooting = false;
+      thumbs.innerHTML = "";
+      countdownEl.textContent = "";
+      startBtn.disabled = false;
+      retakeBtn.disabled = true;
+      updateReadyState();
+      setStep("ready");
+      drawPoster();
+      notice.textContent = stream ? "START SHOOTING을 누르면 5초 간격으로 8장을 촬영합니다." : "카메라 권한을 허용한 뒤 촬영을 시작하세요.";
+    }
+
+    function updateReadyState() {
+      const ready = selectedPhotos.length === REQUIRED_SELECTIONS;
+      selectionCount.textContent = `${selectedPhotos.length} / ${REQUIRED_SELECTIONS} 선택`;
+      saveBtn.disabled = !ready;
+      shareBtn.disabled = !ready || !navigator.share;
+      if (ready) setStep("save");
+    }
+
+    function flashScreen() {
+      flash.classList.remove("on");
+      void flash.offsetWidth;
+      flash.classList.add("on");
+    }
+
+    function captureFrame() {
+      const capCanvas = document.createElement("canvas");
+      capCanvas.width = 1200;
+      capCanvas.height = 900;
+      const ctx = capCanvas.getContext("2d");
+      ctx.translate(capCanvas.width, 0);
+      ctx.scale(-1, 1);
+
+      if (video.readyState >= 2) {
+        ctx.drawImage(video, 0, 0, capCanvas.width, capCanvas.height);
+      } else {
+        ctx.fillStyle = "#1d130c";
+        ctx.fillRect(0, 0, capCanvas.width, capCanvas.height);
+        ctx.fillStyle = "#f5c842";
+        ctx.font = "700 64px Poppins";
+        ctx.textAlign = "center";
+        ctx.fillText("CAMERA STANDBY", capCanvas.width / 2, capCanvas.height / 2);
+      }
+
+      return capCanvas.toDataURL("image/jpeg", 0.92);
+    }
+
+    function addThumb(url, index) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "thumb";
+      button.dataset.number = String(index + 1);
+      button.setAttribute("aria-label", `${index + 1}번째 사진 선택`);
+      button.innerHTML = `<img src="${url}" alt="">`;
+      button.addEventListener("click", () => togglePhoto(url, button));
+      thumbs.appendChild(button);
+    }
+
+    async function startShooting() {
+      if (isShooting) return;
+
+      resetSession();
+      isShooting = true;
       startBtn.disabled = true;
-      saveBtn.style.display = 'none';
-      drawFinal();
+      retakeBtn.disabled = true;
+      setStep("shoot");
 
-      for (let i = 1; i <= 8; i++) {
-        shotCounter.textContent = `READY... (${i} / 8)`;
+      for (let i = 0; i < TOTAL_SHOTS; i += 1) {
+        notice.textContent = `${i + 1} / ${TOTAL_SHOTS} 촬영 준비`;
 
-        for (let count = 5; count > 0; count--) {
+        for (let count = 5; count > 0; count -= 1) {
           countdownEl.textContent = count;
           await sleep(1000);
         }
-        countdownEl.textContent = "💥";
 
-        const capCanvas = document.createElement('canvas');
-        capCanvas.width = 1024;
-        capCanvas.height = 768;
-        const ctx = capCanvas.getContext('2d');
-
-        // 미러 촬영
-        ctx.translate(capCanvas.width, 0);
-        ctx.scale(-1, 1);
-        ctx.drawImage(video, 0, 0, capCanvas.width, capCanvas.height);
-
-        const dataUrl = capCanvas.toDataURL('image/jpeg', 0.9);
-        capturedPhotos.push(dataUrl);
-
-        const img = document.createElement('img');
-        img.src = dataUrl;
-        img.className = 'thumb';
-        img.onclick = () => selectPhoto(dataUrl, img);
-        thumbContainer.appendChild(img);
-
-        await sleep(600);
+        countdownEl.textContent = "BANG";
+        flashScreen();
+        const photo = captureFrame();
+        capturedPhotos.push(photo);
+        addThumb(photo, i);
+        await sleep(520);
         countdownEl.textContent = "";
       }
 
-      shotCounter.textContent = "CHOOSE YOUR 6 CUTS";
+      isShooting = false;
       startBtn.disabled = false;
-    });
-
-    function selectPhoto(url, imgElement) {
-      if (imgElement.classList.contains('selected')) {
-        imgElement.classList.remove('selected');
-        selectedPhotos = selectedPhotos.filter(p => p !== url);
-      } else {
-        if (selectedPhotos.length >= 6) return;
-        imgElement.classList.add('selected');
-        selectedPhotos.push(url);
-      }
-
-      drawFinal();
-
-      const ready = selectedPhotos.length === 6;
-      saveBtn.style.display = ready ? 'block' : 'none';
-
-      // ✅ 모바일 UX: 6장 선택 완료 시 프리뷰로 스크롤
-      if (ready) {
-        previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      retakeBtn.disabled = false;
+      setStep("select");
+      notice.textContent = "촬영 완료. 포스터에 넣을 6장을 순서대로 선택하세요.";
     }
 
-    function drawFinal() {
-      if (!bgImage.complete) return;
+    function togglePhoto(url, thumb) {
+      if (isShooting) return;
 
-      finalCanvas.width = bgImage.naturalWidth;
-      finalCanvas.height = bgImage.naturalHeight;
+      const selectedIndex = selectedPhotos.indexOf(url);
+      if (selectedIndex >= 0) {
+        selectedPhotos.splice(selectedIndex, 1);
+        thumb.classList.remove("selected");
+        thumb.removeAttribute("data-order");
+      } else {
+        if (selectedPhotos.length >= REQUIRED_SELECTIONS) {
+          notice.textContent = "6장까지 선택할 수 있습니다. 바꾸려면 선택된 사진을 먼저 해제하세요.";
+          return;
+        }
+        selectedPhotos.push(url);
+        thumb.classList.add("selected");
+      }
 
-      // 배경
-      finalCtx.clearRect(0, 0, finalCanvas.width, finalCanvas.height);
-      finalCtx.drawImage(bgImage, 0, 0);
+      [...thumbs.children].forEach((item) => {
+        const img = item.querySelector("img");
+        const order = selectedPhotos.indexOf(img.src);
+        if (order >= 0) item.dataset.order = String(order + 1);
+        else item.removeAttribute("data-order");
+      });
 
-      const marginX = finalCanvas.width * 0.08;
-      const marginY = finalCanvas.height * 0.18;
-      const gapX = 15;
-      const gapY = 35;
+      notice.textContent = selectedPhotos.length === REQUIRED_SELECTIONS
+        ? "포스터가 완성되었습니다. 저장하거나 공유하세요."
+        : `${REQUIRED_SELECTIONS - selectedPhotos.length}장을 더 선택하세요.`;
 
-      const photoW = (finalCanvas.width - (marginX * 2) - gapX) / 2;
-      const photoH = (finalCanvas.height * 0.62) / 3;
+      if (selectedPhotos.length === REQUIRED_SELECTIONS) {
+        previewPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else {
+        setStep("select");
+      }
 
-      // 선택 사진 그리기
-      selectedPhotos.forEach((src, i) => {
-        const photoImg = new Image();
-        photoImg.src = src;
-        photoImg.onload = () => {
-          const x = marginX + (i % 2) * (photoW + gapX);
-          const y = marginY + Math.floor(i / 2) * (photoH + gapY);
+      updateReadyState();
+      drawPoster();
+    }
 
-          finalCtx.shadowColor = "rgba(0,0,0,0.6)";
-          finalCtx.shadowBlur = 15;
-          finalCtx.drawImage(photoImg, x, y, photoW, photoH);
-          finalCtx.shadowBlur = 0;
-        };
+    function drawPaperTexture(ctx) {
+      ctx.fillStyle = "#f2deb1";
+      ctx.fillRect(0, 0, POSTER_WIDTH, POSTER_HEIGHT);
+      ctx.globalAlpha = 0.11;
+      for (let i = 0; i < 2600; i += 1) {
+        const shade = Math.random() > 0.5 ? "#6f4b25" : "#ffffff";
+        ctx.fillStyle = shade;
+        ctx.fillRect(Math.random() * POSTER_WIDTH, Math.random() * POSTER_HEIGHT, 1.5, 1.5);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    function applyTheme(ctx) {
+      const themes = {
+        classic: { border: "#6b3518", title: "#21140b", accent: "#b93225", photo: "#fff3d1" },
+        red: { border: "#8e241b", title: "#2a0d0a", accent: "#8e241b", photo: "#ffe1d6" },
+        mono: { border: "#27221d", title: "#16120f", accent: "#3b342e", photo: "#f1eee8" }
+      };
+      return themes[activeTheme] || themes.classic;
+    }
+
+    function drawPosterFrame() {
+      finalCanvas.width = POSTER_WIDTH;
+      finalCanvas.height = POSTER_HEIGHT;
+      const theme = applyTheme(finalCtx);
+
+      drawPaperTexture(finalCtx);
+      finalCtx.strokeStyle = theme.border;
+      finalCtx.lineWidth = 30;
+      finalCtx.strokeRect(40, 40, POSTER_WIDTH - 80, POSTER_HEIGHT - 80);
+      finalCtx.lineWidth = 7;
+      finalCtx.strokeRect(76, 76, POSTER_WIDTH - 152, POSTER_HEIGHT - 152);
+
+      finalCtx.textAlign = "center";
+      finalCtx.fillStyle = theme.title;
+      finalCtx.font = "120px Rye, serif";
+      finalCtx.fillText("WANTED", POSTER_WIDTH / 2, 180);
+
+      finalCtx.fillStyle = theme.accent;
+      finalCtx.font = "44px Poppins, sans-serif";
+      finalCtx.fillText("DEAD OR ALIVE", POSTER_WIDTH / 2, 242);
+
+      finalCtx.fillStyle = "rgba(33, 20, 11, 0.72)";
+      finalCtx.font = "700 32px Poppins, sans-serif";
+      finalCtx.fillText("SELECTED SIX CUTS", POSTER_WIDTH / 2, 1650);
+
+      finalCtx.font = "36px Rye, serif";
+      finalCtx.fillText(`NO. ${sessionId.textContent}`, POSTER_WIDTH / 2, 1718);
+    }
+
+    function drawPhotoSlot(index, image) {
+      const theme = applyTheme(finalCtx);
+      const marginX = 108;
+      const startY = 300;
+      const gapX = 32;
+      const gapY = 44;
+      const photoW = (POSTER_WIDTH - marginX * 2 - gapX) / 2;
+      const photoH = 360;
+      const x = marginX + (index % 2) * (photoW + gapX);
+      const y = startY + Math.floor(index / 2) * (photoH + gapY);
+
+      finalCtx.save();
+      finalCtx.shadowColor = "rgba(0,0,0,0.32)";
+      finalCtx.shadowBlur = 20;
+      finalCtx.shadowOffsetY = 12;
+      finalCtx.fillStyle = theme.photo;
+      finalCtx.fillRect(x - 12, y - 12, photoW + 24, photoH + 24);
+      finalCtx.restore();
+
+      if (image) {
+        const sourceRatio = image.width / image.height;
+        const targetRatio = photoW / photoH;
+        let sx = 0;
+        let sy = 0;
+        let sw = image.width;
+        let sh = image.height;
+
+        if (sourceRatio > targetRatio) {
+          sw = image.height * targetRatio;
+          sx = (image.width - sw) / 2;
+        } else {
+          sh = image.width / targetRatio;
+          sy = (image.height - sh) / 2;
+        }
+
+        finalCtx.drawImage(image, sx, sy, sw, sh, x, y, photoW, photoH);
+      } else {
+        finalCtx.fillStyle = "rgba(33,20,11,0.10)";
+        finalCtx.fillRect(x, y, photoW, photoH);
+        finalCtx.strokeStyle = "rgba(33,20,11,0.2)";
+        finalCtx.lineWidth = 4;
+        finalCtx.strokeRect(x, y, photoW, photoH);
+        finalCtx.fillStyle = "rgba(33,20,11,0.42)";
+        finalCtx.font = "700 54px Poppins, sans-serif";
+        finalCtx.fillText(String(index + 1), x + photoW / 2, y + photoH / 2 + 18);
+      }
+
+      finalCtx.strokeStyle = theme.border;
+      finalCtx.lineWidth = 5;
+      finalCtx.strokeRect(x, y, photoW, photoH);
+    }
+
+    function loadImage(src) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = src;
       });
     }
 
-    saveBtn.addEventListener('click', async () => {
-      const dataUrl = finalCanvas.toDataURL('image/png');
+    async function drawPoster() {
+      drawPosterFrame();
 
-      // 다운로드
-      const link = document.createElement('a');
-      link.download = 'WANTED_POSTER.png';
-      link.href = dataUrl;
+      const loaded = await Promise.all(selectedPhotos.map(loadImage));
+      for (let i = 0; i < REQUIRED_SELECTIONS; i += 1) {
+        drawPhotoSlot(i, loaded[i] || null);
+      }
+    }
+
+    async function getPosterBlob() {
+      await drawPoster();
+      return new Promise((resolve) => finalCanvas.toBlob(resolve, "image/png"));
+    }
+
+    saveBtn.addEventListener("click", async () => {
+      const blob = await getPosterBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = `wanted-${sessionId.textContent}.png`;
+      link.href = url;
       link.click();
+      URL.revokeObjectURL(url);
+    });
 
-      // 공유 (iOS/Android 지원 브라우저)
-      if (navigator.share) {
-        try {
-          const blob = await (await fetch(dataUrl)).blob();
-          const file = new File([blob], 'wanted_6cut.png', { type: 'image/png' });
-          await navigator.share({
-            files: [file],
-            title: 'WANTED 6-CUT',
-            text: 'MY WANTED POSTER'
-          });
-        } catch (e) {
-          // 사용자가 공유 취소해도 에러처럼 떨어질 수 있어 무시
-        }
+    shareBtn.addEventListener("click", async () => {
+      if (!navigator.share) return;
+      try {
+        const blob = await getPosterBlob();
+        const file = new File([blob], `wanted-${sessionId.textContent}.png`, { type: "image/png" });
+        await navigator.share({ files: [file], title: "WANTED 6-CUT", text: "MY WANTED POSTER" });
+      } catch (error) {
+        notice.textContent = "공유가 취소되었습니다.";
       }
     });
+
+    themeButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        activeTheme = button.dataset.theme;
+        themeButtons.forEach((item) => item.classList.toggle("active", item === button));
+        drawPoster();
+      });
+    });
+
+    startBtn.addEventListener("click", startShooting);
+    retakeBtn.addEventListener("click", resetSession);
+
+    initCamera();
+    drawPoster();
   </script>
 </body>
 </html>
